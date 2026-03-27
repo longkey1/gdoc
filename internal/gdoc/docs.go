@@ -2,7 +2,9 @@ package gdoc
 
 import (
 	"fmt"
+	"strings"
 
+	"google.golang.org/api/docs/v1"
 	"google.golang.org/api/drive/v3"
 )
 
@@ -51,4 +53,109 @@ func ListDocuments(svc *drive.Service, query string, mine bool, maxResults int64
 	}
 
 	return result, nil
+}
+
+// DocumentContent represents the content of a Google Doc
+type DocumentContent struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Body  string `json:"body"`
+}
+
+// GetDocumentRaw retrieves the raw Google Docs API document with tabs content
+func GetDocumentRaw(svc *docs.Service, documentID string) (*docs.Document, error) {
+	doc, err := svc.Documents.Get(documentID).IncludeTabsContent(true).Do()
+	if err != nil {
+		return nil, fmt.Errorf("unable to get document: %v", err)
+	}
+	return doc, nil
+}
+
+// FindTabBody finds a tab by ID and returns its DocumentTab.
+// If tabID is empty, returns the first tab's DocumentTab.
+// Searches recursively through child tabs.
+func FindTabBody(doc *docs.Document, tabID string) (*docs.DocumentTab, error) {
+	if len(doc.Tabs) == 0 {
+		// Fallback for documents without tabs
+		return nil, fmt.Errorf("no tabs found in document")
+	}
+
+	if tabID == "" {
+		// Return first tab
+		return doc.Tabs[0].DocumentTab, nil
+	}
+
+	// Search recursively
+	tab := findTabByID(doc.Tabs, tabID)
+	if tab == nil {
+		return nil, fmt.Errorf("tab not found: %s", tabID)
+	}
+	return tab, nil
+}
+
+func findTabByID(tabs []*docs.Tab, tabID string) *docs.DocumentTab {
+	for _, tab := range tabs {
+		if tab.TabProperties != nil && tab.TabProperties.TabId == tabID {
+			return tab.DocumentTab
+		}
+		if found := findTabByID(tab.ChildTabs, tabID); found != nil {
+			return found
+		}
+	}
+	return nil
+}
+
+// GetDocument retrieves a document by ID and extracts its text content
+func GetDocument(svc *docs.Service, documentID string) (*DocumentContent, error) {
+	doc, err := GetDocumentRaw(svc, documentID)
+	if err != nil {
+		return nil, err
+	}
+
+	body := extractText(doc.Body)
+
+	return &DocumentContent{
+		ID:    doc.DocumentId,
+		Title: doc.Title,
+		Body:  body,
+	}, nil
+}
+
+// extractText extracts plain text from a Google Docs Body
+func extractText(body *docs.Body) string {
+	if body == nil {
+		return ""
+	}
+
+	var sb strings.Builder
+	for _, elem := range body.Content {
+		if elem.Paragraph != nil {
+			for _, pe := range elem.Paragraph.Elements {
+				if pe.TextRun != nil {
+					sb.WriteString(pe.TextRun.Content)
+				}
+			}
+		}
+		if elem.Table != nil {
+			for _, row := range elem.Table.TableRows {
+				var cells []string
+				for _, cell := range row.TableCells {
+					var cellText strings.Builder
+					for _, content := range cell.Content {
+						if content.Paragraph != nil {
+							for _, pe := range content.Paragraph.Elements {
+								if pe.TextRun != nil {
+									cellText.WriteString(pe.TextRun.Content)
+								}
+							}
+						}
+					}
+					cells = append(cells, strings.TrimSpace(cellText.String()))
+				}
+				sb.WriteString(strings.Join(cells, "\t"))
+				sb.WriteString("\n")
+			}
+		}
+	}
+	return sb.String()
 }

@@ -23,20 +23,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// filesCmd represents the files command
-var filesCmd = &cobra.Command{
-	Use:   "files",
-	Short: "Manage document files",
-}
-
-// filesListCmd represents the files list command
-var filesListCmd = &cobra.Command{
+// listCmd represents the list command
+var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List your documents",
-	RunE:  runFilesList,
+	RunE:  runList,
 }
 
-func runFilesList(cmd *cobra.Command, args []string) error {
+func runList(cmd *cobra.Command, args []string) error {
 	query, _ := cmd.Flags().GetString("query")
 	mine, _ := cmd.Flags().GetBool("mine")
 	maxResults, _ := cmd.Flags().GetInt64("max-results")
@@ -61,10 +55,9 @@ func runFilesList(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	rootCmd.AddCommand(filesCmd)
-	filesCmd.AddCommand(filesListCmd)
-	filesListCmd.Flags().StringP("query", "q", "", "Search documents by name")
-	filesListCmd.Flags().Bool("mine", false, "Show only documents owned by me")
-	filesListCmd.Flags().Int64P("max-results", "n", 20, "Maximum number of results")
-	filesListCmd.Flags().String("format", "text", "Output format (text or json)")
+	rootCmd.AddCommand(listCmd)
+	listCmd.Flags().StringP("query", "q", "", "Search documents by name")
+	listCmd.Flags().Bool("mine", false, "Show only documents owned by me")
+	listCmd.Flags().Int64P("max-results", "n", 20, "Maximum number of results")
+	listCmd.Flags().String("format", "text", "Output format (text or json)")
 }
