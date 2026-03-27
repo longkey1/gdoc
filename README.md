@@ -81,15 +81,65 @@ gdoc get <document-id> --tab <tab-id>
 gdoc get <document-id> --tab <tab-id> --format markdown
 ```
 
+### Create a Document
+
+```bash
+# Create an empty document
+gdoc create --title "My New Document"
+
+# Create with content from stdin
+echo "Hello, World!" | gdoc create --title "My Document"
+
+# Create with content from a file
+gdoc create --title "My Document" -f content.txt
+
+# Create with Markdown formatting
+gdoc create --title "My Document" -f content.md --format markdown
+```
+
+### Update Document Content
+
+```bash
+# Replace entire content (stdin)
+echo "New content" | gdoc update <document-id>
+
+# Replace entire content from a file
+gdoc update <document-id> -f content.txt
+
+# Append to the end
+echo "Appended text" | gdoc update <document-id> --append
+
+# Prepend to the beginning
+echo "Prepended text" | gdoc update <document-id> --append beginning
+
+# Update a specific tab
+echo "Tab content" | gdoc update <document-id> --tab <tab-id>
+
+# Append to a specific tab
+echo "More content" | gdoc update <document-id> --tab <tab-id> --append
+
+# Update with Markdown formatting
+echo "# Heading\n**bold** text" | gdoc update <document-id> --format markdown
+```
+
 ### Tabs
 
-Google Docs supports multiple tabs within a single document. Use the `--tab` flag with the `get` command to access specific tabs.
+Google Docs supports multiple tabs within a single document. Use the `--tab` flag with `get` and `update` commands to access specific tabs.
 
-- Without `--tab`: returns the first tab's content
-- With `--tab <tab-id>`: returns the specified tab's content
-- With `--format json`: returns the full API response including all tabs
+- Without `--tab`: targets the first tab
+- With `--tab <tab-id>`: targets the specified tab
+- With `--format json` (get only): returns the full API response including all tabs
 
 To find tab IDs, use `--format json` and look at the `tabs[].tabProperties.tabId` field.
+
+> **Note**: Tab creation is not supported by the Google Docs API. Create tabs in the Google Docs UI, then use `gdoc update --tab <tab-id>` to write content.
+
+### Input Formats
+
+| Format | Description |
+|--------|-------------|
+| `text` | Plain text input (default) |
+| `markdown` | Markdown converted to Google Docs formatting (headings, bold, italic, strikethrough, links, lists) |
 
 ### Output Formats
 
@@ -132,7 +182,15 @@ gdoc get abc123 --format json | jq '.tabs[].tabProperties'
 
 # 5. Get a specific tab
 gdoc get abc123 --tab t.123456 --format markdown
+
+# 6. Create a new document from a Markdown file
+gdoc create --title "Weekly Report" -f report.md --format markdown
+
+# 7. Append to an existing document
+echo "Updated at $(date)" | gdoc update abc123 --append
 ```
+
+> **Note**: If you previously authenticated with read-only scopes, run `gdoc auth` again after upgrading to a version with write support.
 
 ### Version
 

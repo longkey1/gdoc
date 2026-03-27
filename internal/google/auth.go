@@ -19,7 +19,7 @@ import (
 // Scopes returns the OAuth scopes required by this application
 func Scopes() []string {
 	return []string{
-		docs.DocumentsReadonlyScope,
+		docs.DocumentsScope,
 		drive.DriveMetadataReadonlyScope,
 	}
 }
