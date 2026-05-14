@@ -64,9 +64,14 @@ gdoc list --format json
 
 ### Get Document Content
 
+The `get` command accepts either a document ID or a Google Docs URL.
+
 ```bash
 # Get document as plain text
 gdoc get <document-id>
+
+# Pass a Google Docs URL instead of an ID
+gdoc get https://docs.google.com/document/d/<document-id>/edit
 
 # Get document as Markdown (headings, bold, italic, lists, tables, links)
 gdoc get <document-id> --format markdown
@@ -79,7 +84,12 @@ gdoc get <document-id> --tab <tab-id>
 
 # Get a specific tab as Markdown
 gdoc get <document-id> --tab <tab-id> --format markdown
+
+# Pass a URL that already includes a tab; --tab is inferred from the URL
+gdoc get "https://docs.google.com/document/d/<document-id>/edit?tab=<tab-id>"
 ```
+
+When the URL contains a `tab` query parameter, the tab is taken from the URL. Specifying `--tab` together with such a URL is rejected as ambiguous.
 
 ### Create a Document
 
@@ -99,9 +109,16 @@ gdoc create --title "My Document" -f content.md --format markdown
 
 ### Update Document Content
 
+The `update` command accepts either a document ID or a Google Docs URL, with the
+same URL handling rules as `get` (a `tab` query parameter is honored; combining
+it with `--tab` is rejected as ambiguous).
+
 ```bash
 # Replace entire content (stdin)
 echo "New content" | gdoc update <document-id>
+
+# Pass a Google Docs URL instead of an ID
+echo "New content" | gdoc update https://docs.google.com/document/d/<document-id>/edit
 
 # Replace entire content from a file
 gdoc update <document-id> -f content.txt
@@ -114,6 +131,9 @@ echo "Prepended text" | gdoc update <document-id> --append beginning
 
 # Update a specific tab
 echo "Tab content" | gdoc update <document-id> --tab <tab-id>
+
+# Update a specific tab via URL
+echo "Tab content" | gdoc update "https://docs.google.com/document/d/<document-id>/edit?tab=<tab-id>"
 
 # Append to a specific tab
 echo "More content" | gdoc update <document-id> --tab <tab-id> --append

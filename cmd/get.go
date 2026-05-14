@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/longkey1/gdoc/internal/gdoc"
@@ -25,16 +26,26 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get <document-id>",
+	Use:   "get <document-id-or-url>",
 	Short: "Get document content",
 	Args:  cobra.ExactArgs(1),
 	RunE:  runGet,
 }
 
 func runGet(cmd *cobra.Command, args []string) error {
-	documentID := args[0]
+	documentID, urlTabID, err := gdoc.ParseDocumentInput(args[0])
+	if err != nil {
+		return err
+	}
 	format, _ := cmd.Flags().GetString("format")
 	tabID, _ := cmd.Flags().GetString("tab")
+
+	if urlTabID != "" {
+		if cmd.Flags().Changed("tab") {
+			return fmt.Errorf("cannot specify --tab when URL already contains tab")
+		}
+		tabID = urlTabID
+	}
 
 	cfg := GetConfig()
 	if err := cfg.Validate(); err != nil {

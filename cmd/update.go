@@ -27,15 +27,25 @@ import (
 
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
-	Use:   "update <document-id>",
+	Use:   "update <document-id-or-url>",
 	Short: "Update document content",
 	Args:  cobra.ExactArgs(1),
 	RunE:  runUpdate,
 }
 
 func runUpdate(cmd *cobra.Command, args []string) error {
-	documentID := args[0]
+	documentID, urlTabID, err := gdoc.ParseDocumentInput(args[0])
+	if err != nil {
+		return err
+	}
 	tabID, _ := cmd.Flags().GetString("tab")
+
+	if urlTabID != "" {
+		if cmd.Flags().Changed("tab") {
+			return fmt.Errorf("cannot specify --tab when URL already contains tab")
+		}
+		tabID = urlTabID
+	}
 	appendMode, _ := cmd.Flags().GetString("append")
 	filePath, _ := cmd.Flags().GetString("file")
 	format, _ := cmd.Flags().GetString("format")

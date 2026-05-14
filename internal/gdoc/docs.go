@@ -2,11 +2,33 @@ package gdoc
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"google.golang.org/api/docs/v1"
 	"google.golang.org/api/drive/v3"
 )
+
+// ParseDocumentInput accepts either a Google Docs document ID or a Google Docs URL,
+// and returns the document ID along with an optional tab ID parsed from the URL's
+// `tab` query parameter. Bare IDs return an empty tab ID.
+func ParseDocumentInput(input string) (docID string, tabID string, err error) {
+	if !strings.HasPrefix(input, "http://") && !strings.HasPrefix(input, "https://") {
+		return input, "", nil
+	}
+
+	u, err := url.Parse(input)
+	if err != nil {
+		return "", "", fmt.Errorf("invalid URL: %v", err)
+	}
+
+	parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+	if len(parts) < 3 || parts[0] != "document" || parts[1] != "d" {
+		return "", "", fmt.Errorf("not a Google Docs URL: %s", input)
+	}
+
+	return parts[2], u.Query().Get("tab"), nil
+}
 
 // DocumentInfo represents a document in Google Drive
 type DocumentInfo struct {
