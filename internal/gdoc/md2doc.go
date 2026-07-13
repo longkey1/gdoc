@@ -33,7 +33,6 @@ type parsedLine struct {
 
 var (
 	boldRe          = regexp.MustCompile(`\*\*(.+?)\*\*`)
-	italicRe        = regexp.MustCompile(`(?:^|[^*])\*([^*]+?)\*(?:[^*]|$)`)
 	strikethroughRe = regexp.MustCompile(`~~(.+?)~~`)
 	linkRe          = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
 )
