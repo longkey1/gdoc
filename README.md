@@ -260,4 +260,4 @@ gdoc version --short
 
 ## License
 
-Apache License 2.0
+MIT
