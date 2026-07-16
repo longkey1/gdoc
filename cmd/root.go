@@ -26,9 +26,15 @@ import (
 )
 
 var (
-	cfgFile string
-	config  *gdoc.Config
+	cfgFile      string
+	config       *gdoc.Config
+	readOnlyFlag bool
 )
+
+// writeAnnotation marks commands that mutate document content. Set it via
+// Annotations on a command's init() so checkReadOnly can block it in
+// read-only mode without a per-command hardcoded list.
+const writeAnnotation = "write"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -53,6 +59,30 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gdoc/config.toml)")
+	rootCmd.PersistentFlags().BoolVar(&readOnlyFlag, "read-only", false, "disable write commands (overrides read_only in config/env)")
+	rootCmd.PersistentPreRunE = checkReadOnly
+}
+
+// checkReadOnly blocks commands annotated with writeAnnotation when
+// read-only mode is enabled via --read-only, or read_only in config
+// (settable via the READ_ONLY env var too).
+func checkReadOnly(cmd *cobra.Command, args []string) error {
+	if cmd.Annotations[writeAnnotation] != "true" {
+		return nil
+	}
+
+	readOnly := false
+	if config != nil {
+		readOnly = config.ReadOnly
+	}
+	if cmd.Flags().Changed("read-only") {
+		readOnly = readOnlyFlag
+	}
+
+	if readOnly {
+		return fmt.Errorf("command %q is disabled in read-only mode", cmd.Name())
+	}
+	return nil
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -68,6 +98,7 @@ func initConfig() {
 		viper.SetConfigType("toml")
 	}
 
+	viper.SetEnvPrefix("GDOC")
 	viper.AutomaticEnv()
 
 	// Config file is optional for some commands (e.g., version)

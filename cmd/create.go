@@ -26,9 +26,10 @@ import (
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a new Google Doc",
-	RunE:  runCreate,
+	Use:         "create",
+	Short:       "Create a new Google Doc",
+	RunE:        runCreate,
+	Annotations: map[string]string{writeAnnotation: "true"},
 }
 
 func runCreate(cmd *cobra.Command, args []string) error {

@@ -27,10 +27,11 @@ import (
 
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
-	Use:   "update <document-id-or-url>",
-	Short: "Update document content",
-	Args:  cobra.ExactArgs(1),
-	RunE:  runUpdate,
+	Use:         "update <document-id-or-url>",
+	Short:       "Update document content",
+	Args:        cobra.ExactArgs(1),
+	RunE:        runUpdate,
+	Annotations: map[string]string{writeAnnotation: "true"},
 }
 
 func runUpdate(cmd *cobra.Command, args []string) error {

@@ -225,6 +225,7 @@ gdoc version
 | `auth_type` | Authentication type: `oauth` or `service_account` |
 | `application_credentials` | Path to OAuth client credentials JSON file |
 | `user_credentials` | Path to store OAuth user token (for OAuth auth type) |
+| `read_only` | When `true`, disables write commands (`create`, `update`). Also settable via the `GDOC_READ_ONLY` env var, and overridable per-invocation with `--read-only`/`--read-only=false` |
 
 ## License
 
