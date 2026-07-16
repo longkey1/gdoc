@@ -18,7 +18,11 @@ brew install longkey1/tap/gdoc
 
 ## Setup
 
-### 1. Create Google Cloud Project and OAuth Credentials
+gdoc supports two authentication methods: OAuth (for personal use) and Service Account (for automation/CI).
+
+### OAuth
+
+#### 1. Create Google Cloud Project and OAuth Credentials
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
@@ -26,7 +30,7 @@ brew install longkey1/tap/gdoc
 4. Create OAuth 2.0 credentials (Desktop application type)
 5. Download the credentials JSON file
 
-### 2. Create Configuration File
+#### 2. Create Configuration File
 
 Create `~/.config/gdoc/config.toml`:
 
@@ -36,13 +40,34 @@ application_credentials = "/path/to/credentials.json"
 user_credentials = "/path/to/token.json"
 ```
 
-### 3. Authenticate
+#### 3. Authenticate
 
 ```bash
 gdoc auth
 ```
 
 This will open your browser for Google OAuth authentication.
+
+### Service Account
+
+#### 1. Create a Service Account
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google Docs API and Google Drive API
+4. Create a Service Account and download its credentials JSON file
+5. Share the target documents/folders with the service account's email address
+
+#### 2. Create Configuration File
+
+Create `~/.config/gdoc/config.toml`:
+
+```toml
+auth_type = "service_account"
+application_credentials = "/path/to/service-account.json"
+```
+
+`user_credentials` and the `gdoc auth` command are not needed for Service Account authentication.
 
 ## Usage
 
@@ -57,6 +82,9 @@ gdoc list -q "meeting notes"
 
 # Show only documents owned by me
 gdoc list --mine
+
+# Limit the number of results (default: 20)
+gdoc list --max-results 50
 
 # Output as JSON
 gdoc list --format json
@@ -216,6 +244,9 @@ echo "Updated at $(date)" | gdoc update abc123 --append
 
 ```bash
 gdoc version
+
+# Show only the version number
+gdoc version --short
 ```
 
 ## Configuration Options
