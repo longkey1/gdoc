@@ -265,8 +265,6 @@ func parseLine(line string) parsedLine {
 
 // markedRange represents a range of formatted text in the original Markdown string.
 type markedRange struct {
-	start         int
-	end           int
 	originalStart int
 	originalEnd   int
 	bold          bool
@@ -322,9 +320,7 @@ func parseInlineFormatting(text string) []textSegment {
 	}
 
 	// Find italic (single asterisk, not double)
-	for _, match := range findItalicRanges(text, ranges) {
-		ranges = append(ranges, match)
-	}
+	ranges = append(ranges, findItalicRanges(text, ranges)...)
 
 	// Sort ranges by original start position
 	sortRanges(ranges)

@@ -13,6 +13,7 @@ make build       # Build binary to bin/gdoc
 make test        # Run tests (go test ./...)
 make fmt         # Format code (go fmt ./...)
 make vet         # Vet code (go vet ./...)
+make lint        # Run golangci-lint (version managed by go.mod tool directive)
 make tidy        # Tidy dependencies (go mod tidy)
 ```
 

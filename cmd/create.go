@@ -80,8 +80,8 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	fmt.Fprintf(os.Stdout, "Document created: %s\n", doc.DocumentId)
-	fmt.Fprintf(os.Stdout, "URL: https://docs.google.com/document/d/%s/edit\n", doc.DocumentId)
+	_, _ = fmt.Fprintf(os.Stdout, "Document created: %s\n", doc.DocumentId)
+	_, _ = fmt.Fprintf(os.Stdout, "URL: https://docs.google.com/document/d/%s/edit\n", doc.DocumentId)
 	return nil
 }
 

@@ -16,7 +16,7 @@ func ReadInput(filePath string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("unable to open input file: %v", err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		r = f
 	}
 

@@ -83,7 +83,7 @@ func paragraphToMarkdown(p *docs.Paragraph, lists map[string]docs.List) string {
 			sb.WriteString("\n---\n")
 		}
 		if elem.InlineObjectElement != nil {
-			sb.WriteString(fmt.Sprintf("![image](%s)", elem.InlineObjectElement.InlineObjectId))
+			_, _ = fmt.Fprintf(&sb, "![image](%s)", elem.InlineObjectElement.InlineObjectId)
 		}
 	}
 

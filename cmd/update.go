@@ -97,8 +97,8 @@ func updateWithText(svc *docs.Service, docID, tabID, appendMode string, appendFl
 		}
 	}
 
-	fmt.Fprintf(os.Stdout, "Document updated: %s\n", docID)
-	fmt.Fprintf(os.Stdout, "URL: https://docs.google.com/document/d/%s/edit\n", docID)
+	_, _ = fmt.Fprintf(os.Stdout, "Document updated: %s\n", docID)
+	_, _ = fmt.Fprintf(os.Stdout, "URL: https://docs.google.com/document/d/%s/edit\n", docID)
 	return nil
 }
 
@@ -175,8 +175,8 @@ func updateWithMarkdown(svc *docs.Service, docID, tabID, appendMode string, appe
 		}
 	}
 
-	fmt.Fprintf(os.Stdout, "Document updated: %s\n", docID)
-	fmt.Fprintf(os.Stdout, "URL: https://docs.google.com/document/d/%s/edit\n", docID)
+	_, _ = fmt.Fprintf(os.Stdout, "Document updated: %s\n", docID)
+	_, _ = fmt.Fprintf(os.Stdout, "URL: https://docs.google.com/document/d/%s/edit\n", docID)
 	return nil
 }
 

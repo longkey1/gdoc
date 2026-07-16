@@ -25,7 +25,7 @@ func FormatDocumentList(w io.Writer, documents []DocumentInfo, format OutputForm
 		if err != nil {
 			return fmt.Errorf("unable to marshal JSON: %w", err)
 		}
-		fmt.Fprintln(w, string(data))
+		_, _ = fmt.Fprintln(w, string(data))
 		return nil
 	}
 
@@ -33,10 +33,10 @@ func FormatDocumentList(w io.Writer, documents []DocumentInfo, format OutputForm
 	table.Header("ID", "NAME", "MODIFIED")
 
 	for _, d := range documents {
-		table.Append(d.ID, d.Name, d.ModifiedTime)
+		_ = table.Append(d.ID, d.Name, d.ModifiedTime)
 	}
 
-	table.Render()
+	_ = table.Render()
 	return nil
 }
 
@@ -47,11 +47,11 @@ func FormatDocumentContent(w io.Writer, content *DocumentContent, format OutputF
 		if err != nil {
 			return fmt.Errorf("unable to marshal JSON: %w", err)
 		}
-		fmt.Fprintln(w, string(data))
+		_, _ = fmt.Fprintln(w, string(data))
 		return nil
 	}
 
-	fmt.Fprint(w, content.Body)
+	_, _ = fmt.Fprint(w, content.Body)
 	return nil
 }
 
@@ -61,7 +61,7 @@ func FormatDocumentRaw(w io.Writer, doc *docs.Document) error {
 	if err != nil {
 		return fmt.Errorf("unable to marshal JSON: %w", err)
 	}
-	fmt.Fprintln(w, string(data))
+	_, _ = fmt.Fprintln(w, string(data))
 	return nil
 }
 
@@ -73,14 +73,14 @@ func FormatDocumentTab(w io.Writer, tab *docs.DocumentTab, format OutputFormat) 
 		if err != nil {
 			return fmt.Errorf("unable to marshal JSON: %w", err)
 		}
-		fmt.Fprintln(w, string(data))
+		_, _ = fmt.Fprintln(w, string(data))
 		return nil
 	case OutputFormatMarkdown:
-		fmt.Fprint(w, DocumentTabToMarkdown(tab))
+		_, _ = fmt.Fprint(w, DocumentTabToMarkdown(tab))
 		return nil
 	default:
 		// text format: extract plain text
-		fmt.Fprint(w, extractText(tab.Body))
+		_, _ = fmt.Fprint(w, extractText(tab.Body))
 		return nil
 	}
 }
